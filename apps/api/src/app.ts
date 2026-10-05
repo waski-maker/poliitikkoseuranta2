@@ -25,7 +25,7 @@ export function createAuthAdapter(rt: Runtime): AuthAdapter {
     return supabaseAuth({
       url: c.SUPABASE_URL,
       anonKey: c.SUPABASE_ANON_KEY,
-      jwtSecret: c.SUPABASE_JWT_SECRET,
+      jwtSecret: c.SUPABASE_JWT_SECRET ?? c.AUTH_JWT_SECRET,
     });
   }
   if (c.AUTH_PROVIDER === 'oidc') {

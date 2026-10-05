@@ -97,7 +97,11 @@ export const configSchema = z.object({
 export type AppConfig = z.infer<typeof configSchema>;
 
 export function loadConfig(env: Record<string, string | undefined>): AppConfig {
-  const parsed = configSchema.safeParse(env);
+  // Supabase Edge Functions provide SUPABASE_DB_URL automatically.
+  // Empty values (KEY= in .env) mean "not set".
+  const cleaned = Object.fromEntries(Object.entries(env).filter(([, v]) => v !== undefined && v !== ''));
+  const merged = { ...cleaned, DATABASE_URL: env.DATABASE_URL || env.SUPABASE_DB_URL };
+  const parsed = configSchema.safeParse(merged);
   if (!parsed.success) {
     const issues = parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ');
     throw new Error(`Virheelliset asetukset: ${issues}`);

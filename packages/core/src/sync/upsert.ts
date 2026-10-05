@@ -80,7 +80,9 @@ export async function upsertSynced(
     changes[k] = v;
   }
   const meta: Record<string, unknown> = { fetchedAt: now };
-  if (Object.keys(changes).length && allowed.includes(rowSource as never)) {
+  // Seed data confirmed by an authoritative source takes over its provenance.
+  const confirmsSeed = rowSource === 'seed' && opts.source !== 'seed';
+  if ((Object.keys(changes).length || confirmsSeed) && allowed.includes(rowSource as never)) {
     meta.source = opts.source;
     if (opts.sourceUrl !== undefined) meta.sourceUrl = opts.sourceUrl;
   }

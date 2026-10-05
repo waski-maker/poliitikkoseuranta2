@@ -1,0 +1,11 @@
+# Same schedule as .github/workflows/jobs.yml and backup.yml (container time zone UTC).
+SHELL=/bin/sh
+PATH=/usr/local/bin:/usr/bin:/bin
+* * * * * root cd /app && pnpm -s job work --max 10 >> /proc/1/fd/1 2>&1
+15 2 * * * root cd /app && pnpm -s job run sync:registries >> /proc/1/fd/1 2>&1
+5 8-18 * * 2-5 root cd /app && pnpm -s job run sync:registries >> /proc/1/fd/1 2>&1
+*/10 * * * * root cd /app && pnpm -s job run events:dispatch >> /proc/1/fd/1 2>&1
+0 */6 * * * root cd /app && pnpm -s job run health:check >> /proc/1/fd/1 2>&1
+30 1 * * * root cd /app && pnpm -s job run backup:full >> /proc/1/fd/1 2>&1
+0 4 1 * * root cd /app && pnpm -s job run backup:verify >> /proc/1/fd/1 2>&1
+45 2 * * * root cd /app && pnpm -s job run trash:purge >> /proc/1/fd/1 2>&1

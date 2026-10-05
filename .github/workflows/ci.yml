@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Lint, tyypit, testit, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ps_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/ps_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm typecheck
+      - name: SDK on ajan tasalla OpenAPI-kuvauksen kanssa
+        run: |
+          pnpm sdk:generate
+          git diff --exit-code packages/sdk || (echo "::error::Aja pnpm sdk:generate ja commitoi muutokset" && exit 1)
+      - run: pnpm test
+      - name: Build (web, Node-API, Edge Function)
+        run: |
+          pnpm build:web
+          pnpm --filter @ps/api build
+          pnpm build:edge
+      - name: Käyttöliittymätestit (Playwright)
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/ps_e2e
+          AUTH_PROVIDER: dev
+          AUTH_JWT_SECRET: ci-secret-ci-secret-ci-secret-ci-secret
+          ALLOWED_EMAILS: admin@example.com
+          SETTINGS_ENCRYPTION_KEY: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+          STORAGE_PROVIDER: memory
+          BACKUP_BEFORE_MIGRATE: 'false'
+        run: |
+          PGPASSWORD=postgres psql -h localhost -U postgres -c 'create database ps_e2e'
+          pnpm db:migrate
+          pnpm db:seed
+          pnpm --filter @ps/web exec playwright install --with-deps chromium
+          pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: apps/web/test-results
+          retention-days: 7

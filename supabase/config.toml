@@ -1,0 +1,41 @@
+# Supabase CLI configuration (local development: `supabase start`).
+project_id = "poliitikkoseuranta"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+
+[db]
+port = 54322
+major_version = 17
+
+[db.migrations]
+enabled = true
+
+[realtime]
+enabled = true
+
+[studio]
+enabled = true
+port = 54323
+
+[storage]
+enabled = true
+file_size_limit = "200MiB"
+
+[auth]
+enabled = true
+site_url = "http://localhost:5173"
+additional_redirect_urls = ["http://localhost:5173/"]
+jwt_expiry = 3600
+# No public sign-up: users are created from ALLOWED_EMAILS (pnpm deploy:setup).
+enable_signup = false
+
+[auth.email]
+enable_signup = false
+enable_confirmations = false
+
+[functions.api]
+# The API verifies JWTs itself (Supabase Auth or any OIDC provider).
+verify_jwt = false

@@ -1,0 +1,72 @@
+# Self-hosting on your own server / VPS: web (Caddy), API (Node), worker (cron)
+# and PostgreSQL + pgvector. See docs/DEPLOYMENT.md.
+#   cp .env.example .env   # fill in, AUTH_PROVIDER=oidc or supabase
+#   docker compose -f deploy/docker-compose.selfhost.yml --env-file .env up -d --build
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-poliitikko}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Aseta POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-poliitikkoseuranta}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-poliitikko}']
+      interval: 5s
+      retries: 20
+
+  api:
+    build: { context: .., dockerfile: deploy/Dockerfile, target: api }
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-poliitikko}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-poliitikkoseuranta}
+      JOBS_RUNNER: queue
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-local}
+      STORAGE_LOCAL_DIR: /data/storage
+      REALTIME_PROVIDER: polling
+    volumes:
+      - storage:/data/storage
+    depends_on:
+      db: { condition: service_healthy }
+
+  worker:
+    build: { context: .., dockerfile: deploy/Dockerfile, target: worker }
+    restart: unless-stopped
+    env_file: ../.env
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-poliitikko}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-poliitikkoseuranta}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-local}
+      STORAGE_LOCAL_DIR: /data/storage
+      BACKUP_LOCAL_DIR: /data/backups
+    volumes:
+      - storage:/data/storage
+      - backups:/data/backups
+    depends_on:
+      db: { condition: service_healthy }
+
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: web
+      args:
+        VITE_API_URL: ${PUBLIC_URL:-http://localhost}
+        VITE_BASE_PATH: /
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:-:80}
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - caddy:/data
+    depends_on: [api]
+
+volumes:
+  pgdata:
+  storage:
+  backups:
+  caddy:

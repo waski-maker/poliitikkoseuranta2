@@ -1,0 +1,28 @@
+{
+  "name": "Poliitikkoseuranta",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers-extra/features/supabase-cli:1": {}
+  },
+  "forwardPorts": [5173, 8787, 5432, 54321, 54323],
+  "portsAttributes": {
+    "5173": { "label": "Käyttöliittymä" },
+    "8787": { "label": "API" },
+    "54323": { "label": "Supabase Studio" }
+  },
+  "postCreateCommand": "corepack enable && pnpm run setup",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "ms-playwright.playwright",
+        "denoland.vscode-deno"
+      ],
+      "settings": { "editor.formatOnSave": true, "deno.enablePaths": ["supabase/functions"] }
+    }
+  }
+}

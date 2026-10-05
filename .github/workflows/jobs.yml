@@ -1,0 +1,74 @@
+name: Taustatyöt
+
+# Background jobs run as CLI commands (the same commands work with cron or Docker).
+#  - workflow_dispatch with job_id: started from the UI via the API (jobs runner = github-actions)
+#  - workflow_dispatch with job: manual run, e.g. "sync:registries"
+#  - schedule: daily synchronisation, more often on plenary session days (Tue–Fri)
+on:
+  workflow_dispatch:
+    inputs:
+      job_id:
+        description: 'Jonossa olevan työn tunniste (käyttöliittymä täyttää)'
+        required: false
+      job:
+        description: 'Ajettava työ, esim. sync:registries, health:check, events:dispatch'
+        required: false
+      payload:
+        description: 'Työn parametrit JSON-muodossa'
+        required: false
+        default: '{}'
+  schedule:
+    - cron: '15 2 * * *' # every night 05:15 Finnish summer time
+    - cron: '5 8-18 * * 2-5' # hourly during session days
+
+concurrency:
+  group: jobs-${{ github.event.inputs.job_id || github.event.inputs.job || github.event.schedule }}
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SETTINGS_ENCRYPTION_KEY: ${{ secrets.SETTINGS_ENCRYPTION_KEY }}
+      BACKUP_ENCRYPTION_KEY: ${{ secrets.BACKUP_ENCRYPTION_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      STORAGE_PROVIDER: ${{ vars.STORAGE_PROVIDER || 'supabase' }}
+      EDUSKUNTA_USER_AGENT: ${{ vars.EDUSKUNTA_USER_AGENT || 'Poliitikkoseuranta/2.0 (+https://github.com/)' }}
+      JOBS_RUNNER: queue
+    steps:
+      - name: Tarkista asetukset
+        id: cfg
+        run: |
+          if [ -z "$DATABASE_URL" ]; then echo "::warning::DATABASE_URL puuttuu (aja pnpm deploy:setup). Ohitetaan."; echo "skip=true" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.cfg.outputs.skip != 'true'
+        uses: actions/checkout@v4
+      - if: steps.cfg.outputs.skip != 'true'
+        uses: pnpm/action-setup@v4
+      - if: steps.cfg.outputs.skip != 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - if: steps.cfg.outputs.skip != 'true'
+        run: pnpm install --frozen-lockfile
+      - if: steps.cfg.outputs.skip != 'true' && github.event.inputs.job_id
+        name: Jonossa oleva työ
+        run: pnpm job work --id "${{ github.event.inputs.job_id }}"
+      - if: steps.cfg.outputs.skip != 'true' && github.event.inputs.job
+        name: Käsin käynnistetty työ
+        run: pnpm job run "${{ github.event.inputs.job }}" --payload '${{ github.event.inputs.payload }}'
+      - if: steps.cfg.outputs.skip != 'true' && github.event_name == 'schedule'
+        name: Ajastetut synkronoinnit ja ylläpito
+        run: |
+          pnpm job run sync:registries || echo "::warning::sync:registries epäonnistui"
+          pnpm job run events:dispatch
+          pnpm job run health:check || true
+          pnpm job work --max 20
+      - if: steps.cfg.outputs.skip != 'true' && github.event_name == 'schedule' && github.event.schedule == '15 2 * * *'
+        name: Roskakorin tyhjennys
+        run: pnpm job run trash:purge

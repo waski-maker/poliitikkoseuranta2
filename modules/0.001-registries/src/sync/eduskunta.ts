@@ -125,13 +125,16 @@ export function referenceSync(baseUrl: () => string): SyncSourceDefinition {
       const http = ctx.createHttp();
       const kinds = ['eduskuntaryhmat', 'vaalipiirit', 'vaalikaudet', 'valiokunnat'] as const;
       let step = 0;
+      const failures: string[] = [];
       for (const kind of kinds) {
         await ctx.progress(step++, kinds.length, `Haetaan ${kind}`);
         let list: Record<string, unknown>[];
         try {
           list = unwrapList(await http.json(`reference-data/${kind}`));
         } catch (err) {
-          ctx.itemError(`${kind}: ${err instanceof Error ? err.message : String(err)}`);
+          const msg = `${kind}: ${err instanceof Error ? err.message : String(err)}`;
+          failures.push(msg);
+          ctx.itemError(msg);
           continue;
         }
         ctx.counters.fetched += list.length;
@@ -151,6 +154,9 @@ export function referenceSync(baseUrl: () => string): SyncSourceDefinition {
           });
         }
         ctx.log.info(`${kind}: ${list.length} riviä`);
+      }
+      if (failures.length === kinds.length) {
+        throw new Error(`Eduskunnan rajapintaan ei saatu yhteyttä (${failures[0]})`);
       }
       await ctx.progress(kinds.length, kinds.length, 'Valmis');
     },
