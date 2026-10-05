@@ -1,0 +1,39 @@
+{
+  "name": "@ps/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Web-k\u00e4ytt\u00f6liittym\u00e4 (staattinen vienti GitHub Pagesiin tai mille tahansa staattiselle palvelimelle)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.2.0",
+    "@fontsource-variable/source-serif-4": "^5.2.0",
+    "@ps/m0001-registries": "workspace:*",
+    "@ps/sdk": "workspace:*",
+    "@ps/ui": "workspace:*",
+    "@supabase/supabase-js": "^2.75.0",
+    "@tanstack/react-query": "^5.90.0",
+    "lucide-react": "^0.577.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-router": "^7.9.0",
+    "recharts": "^3.2.0",
+    "@ps/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "@tailwindcss/vite": "^4.1.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "tailwindcss": "^4.1.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.1.0"
+  }
+}

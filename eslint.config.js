@@ -28,7 +28,8 @@ export default tseslint.config(
           patterns: [
             {
               group: ['@supabase/*'],
-              message: 'Supabase-specific code belongs only in adapters (packages/core/src/services/adapters) or apps/web auth adapter.',
+              message:
+                'Supabase-specific code belongs only in adapters (packages/core/src/services/adapters) or apps/web auth adapter.',
             },
           ],
         },

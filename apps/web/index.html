@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <meta
+      name="description"
+      content="Poliitikkoseuranta – suomalaisen politiikan avoimen datan seuranta ja analyysi"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232952b8'/%3E%3Cpath d='M9 22V10h7a4 4 0 010 8h-7' stroke='white' stroke-width='3' fill='none'/%3E%3C/svg%3E"
+    />
+    <title>Poliitikkoseuranta</title>
+    <script>
+      // GitHub Pages SPA fallback: public/404.html redirects /repo/some/path to
+      // /repo/?/some/path; restore the original URL before the router starts.
+      (function (l) {
+        if (l.search[1] === '/') {
+          var decoded = l.search
+            .slice(1)
+            .split('&')
+            .map(function (s) {
+              return s.replace(/~and~/g, '&');
+            })
+            .join('?');
+          window.history.replaceState(null, '', l.pathname.slice(0, -1) + decoded + l.hash);
+        }
+      })(window.location);
+      try {
+        var t = localStorage.getItem('ps-theme');
+        if (t === 'dark' || (t !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches))
+          document.documentElement.classList.add('dark');
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

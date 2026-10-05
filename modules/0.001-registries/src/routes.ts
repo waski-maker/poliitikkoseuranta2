@@ -7,7 +7,6 @@ import {
   json,
   jsonContent,
   requirePermission,
-  serialize,
   NotFoundError,
 } from '@ps/core';
 import { ENTITIES, isEntity, type EntityName, type RegistriesApi } from './api.ts';

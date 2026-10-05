@@ -241,6 +241,14 @@ begin
 end
 $$;
 
+-- Non-row actions (exports, merges, imports) are logged through this function so
+-- that users never need direct write access to the audit log.
+create or replace function core.audit_action(p_action text, p_schema text, p_table text, p_record_id text, p_context jsonb)
+returns void language sql security definer set search_path = core, pg_temp as $$
+  insert into core.audit_log (actor_id, actor_label, action, table_schema, table_name, record_id, context)
+  values (core.actor_id(), nullif(current_setting('app.actor_label', true), ''), p_action, p_schema, p_table, p_record_id, p_context)
+$$;
+
 create or replace function core.touch_trigger() returns trigger
 language plpgsql as $$
 begin
@@ -604,6 +612,16 @@ create policy sync_runs_read on core.sync_runs for select to authenticated using
 
 grant select on core.search_index to authenticated;
 create policy search_read on core.search_index for select to authenticated using (core.has_permission(read_permission));
+-- Modules index their content inside the user's write transaction; writing
+-- requires the module's edit permission (convention: <slug>.edit).
+grant insert, update, delete on core.search_index to authenticated;
+create policy search_write on core.search_index for insert to authenticated
+  with check (core.has_permission(split_part(read_permission, '.', 1) || '.edit'));
+create policy search_update on core.search_index for update to authenticated
+  using (core.has_permission(split_part(read_permission, '.', 1) || '.edit'))
+  with check (core.has_permission(split_part(read_permission, '.', 1) || '.edit'));
+create policy search_delete on core.search_index for delete to authenticated
+  using (core.has_permission(split_part(read_permission, '.', 1) || '.edit'));
 grant select on core.search_index to anon;
 create policy search_public_read on core.search_index for select to anon
   using (core.public_access_enabled() and visibility = 'public');
@@ -631,6 +649,8 @@ create policy service_status_read on core.service_status for select to authentic
 grant execute on function core.has_permission(text), core.is_active_user(), core.public_access_enabled(),
   core.current_user_id(), core.actor_id() to anon, authenticated;
 revoke execute on function core.publish_event(text, text, jsonb, int) from public;
+revoke execute on function core.audit_action(text, text, text, text, jsonb) from public;
+grant execute on function core.audit_action(text, text, text, text, jsonb) to authenticated;
 grant execute on function core.publish_event(text, text, jsonb, int) to authenticated;
 
 -- Realtime (Supabase): job progress and notifications without page reloads.

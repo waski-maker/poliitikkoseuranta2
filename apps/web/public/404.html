@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fi">
+  <head>
+    <meta charset="utf-8" />
+    <title>Poliitikkoseuranta</title>
+    <script>
+      // Single-page app redirect for GitHub Pages (and any static host that serves 404.html).
+      // Keeps the first path segment(s) of the base path; see index.html for the reverse step.
+      var segmentsToKeep = (document.querySelector('meta[name="ps-base-segments"]') || {}).content;
+      var l = window.location;
+      var keep =
+        segmentsToKeep !== undefined ? Number(segmentsToKeep) : l.hostname.endsWith('github.io') ? 1 : 0;
+      l.replace(
+        l.protocol +
+          '//' +
+          l.hostname +
+          (l.port ? ':' + l.port : '') +
+          l.pathname
+            .split('/')
+            .slice(0, 1 + keep)
+            .join('/') +
+          '/?/' +
+          l.pathname.slice(1).split('/').slice(keep).join('/').replace(/&/g, '~and~') +
+          (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+          l.hash,
+      );
+    </script>
+  </head>
+  <body></body>
+</html>

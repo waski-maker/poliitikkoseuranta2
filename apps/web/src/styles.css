@@ -1,0 +1,7 @@
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/source-serif-4';
+@import '@ps/ui/styles.css';
+
+@source '../../../packages/ui/src';
+@source '../../../modules';
+@source './';

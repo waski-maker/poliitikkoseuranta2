@@ -65,8 +65,7 @@ export async function getRow<T>(db: Db, table: string, id: string): Promise<T> {
 }
 
 function toDb(v: unknown): unknown {
-  if (v !== null && typeof v === 'object' && !(v instanceof Date) && !Array.isArray(v))
-    return JSON.stringify(v);
+  // Objects go to jsonb columns; postgres.js serialises them by the column type.
   return v === undefined ? null : v;
 }
 

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "0.001 Perusrekisterit: puolueet, eduskuntaryhmät, vaalipiirit, vaalikaudet, hallitukset, valiokunnat, luottamustoimien tyypit",
+  "description": "0.001 Perusrekisterit: puolueet, eduskuntaryhm\u00e4t, vaalipiirit, vaalikaudet, hallitukset, valiokunnat, luottamustoimien tyypit",
   "exports": {
     ".": "./src/index.ts",
     "./manifest": "./src/manifest.ts",
@@ -21,7 +21,8 @@
     "@ps/sdk": "workspace:*",
     "@ps/ui": "workspace:*",
     "react": "^19.0.0",
-    "react-router": "^7.0.0"
+    "react-router": "^7.0.0",
+    "lucide-react": "*"
   },
   "devDependencies": {
     "@ps/sdk": "workspace:*",
@@ -29,6 +30,7 @@
     "@types/react": "^19.0.0",
     "react": "^19.2.0",
     "react-router": "^7.9.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "lucide-react": "^0.577.0"
   }
 }

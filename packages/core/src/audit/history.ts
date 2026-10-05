@@ -1,5 +1,5 @@
 import type { Db } from '../db/client.ts';
-import { qualified } from '../db/client.ts';
+import { qualified, snakeKeys } from '../db/client.ts';
 import { NotFoundError, ValidationError } from '../util/errors.ts';
 
 export interface AuditEntry {
@@ -57,9 +57,7 @@ export async function auditAction(
   },
 ): Promise<void> {
   const [schema, name] = input.table.split('.');
-  await db`insert into core.audit_log (actor_id, actor_label, action, table_schema, table_name, record_id, context)
-           values (core.actor_id(), nullif(current_setting('app.actor_label', true), ''), ${input.action},
-                   ${schema!}, ${name!}, ${input.recordId ?? null}, ${db.json(input.context as never)})`;
+  await db`select core.audit_action(${input.action}, ${schema!}, ${name!}, ${input.recordId ?? null}, ${db.json(input.context as never)})`;
 }
 
 const NEVER_RESTORE = ['created_at', 'created_by', 'updated_at', 'updated_by'];
@@ -81,23 +79,26 @@ export async function restoreFromAudit(
   if (!entry) throw new NotFoundError('Muutoshistorian riviä ei löytynyt');
   const table = `${entry.tableSchema}.${entry.tableName}`;
   if (!allowedTables.includes(table)) throw new ValidationError(`Taulua ${table} ei voi palauttaa`);
-  const state = which === 'after' ? (entry.newData ?? entry.oldData) : (entry.oldData ?? entry.newData);
+  const raw = which === 'after' ? (entry.newData ?? entry.oldData) : (entry.oldData ?? entry.newData);
+  const state = raw ? snakeKeys(raw) : null;
   if (!state || !entry.recordId) throw new ValidationError('Muutoshistoriassa ei ole palautettavaa tilaa');
   const cols = Object.keys(state).filter(
     (c) => !NEVER_RESTORE.includes(c) && c !== 'id' && /^[a-z_][a-z0-9_]*$/.test(c),
   );
   const q = qualified(table);
-  const json = JSON.stringify(state);
+  const json = state;
   const exists = await db.unsafe(`select 1 from ${q} where id = $1`, [entry.recordId]);
   if (exists.length) {
     await db.unsafe(
       `update ${q} t set (${cols.map((c) => `"${c}"`).join(', ')}) =
          (select ${cols.map((c) => `r."${c}"`).join(', ')} from jsonb_populate_record(null::${q}, $1::jsonb) r)
        where t.id = $2`,
-      [json, entry.recordId],
+      [json as never, entry.recordId],
     );
   } else {
-    await db.unsafe(`insert into ${q} select * from jsonb_populate_record(null::${q}, $1::jsonb)`, [json]);
+    await db.unsafe(`insert into ${q} select * from jsonb_populate_record(null::${q}, $1::jsonb)`, [
+      json as never,
+    ]);
   }
   return { table, recordId: entry.recordId };
 }
@@ -113,7 +114,7 @@ export async function listTrash(db: Db, tables: string[]) {
     )) as unknown as { id: string; deletedAt: Date; data: Record<string, unknown> }[];
     for (const r of rows) {
       const d = r.data;
-      const label = String(d.name_fi ?? d.name ?? d.title ?? d.abbreviation ?? d.code ?? r.id);
+      const label = String(d.nameFi ?? d.name ?? d.title ?? d.abbreviation ?? d.code ?? r.id);
       out.push({ table: t, id: r.id, label, deletedAt: r.deletedAt, data: d });
     }
   }

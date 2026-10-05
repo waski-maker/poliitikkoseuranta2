@@ -1,0 +1,148 @@
+/*
+ * Poliitikkoseuranta design tokens (Tailwind CSS v4).
+ * Calm neutral base, one accent colour; party colours only as small marks.
+ * Every module UI uses these tokens through @ps/ui components.
+ */
+@import 'tailwindcss';
+
+@source '../src';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Source Serif 4 Variable', 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, monospace;
+
+  --color-bg: var(--ps-bg);
+  --color-surface: var(--ps-surface);
+  --color-surface-2: var(--ps-surface-2);
+  --color-border: var(--ps-border);
+  --color-border-strong: var(--ps-border-strong);
+  --color-fg: var(--ps-fg);
+  --color-muted: var(--ps-muted);
+  --color-subtle: var(--ps-subtle);
+  --color-accent: var(--ps-accent);
+  --color-accent-fg: var(--ps-accent-fg);
+  --color-accent-soft: var(--ps-accent-soft);
+  --color-danger: var(--ps-danger);
+  --color-danger-soft: var(--ps-danger-soft);
+  --color-success: var(--ps-success);
+  --color-success-soft: var(--ps-success-soft);
+  --color-warning: var(--ps-warning);
+  --color-warning-soft: var(--ps-warning-soft);
+  --color-ring: var(--ps-ring);
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+
+  --shadow-xs: 0 1px 2px rgb(15 23 42 / 0.05);
+  --shadow-sm: 0 1px 3px rgb(15 23 42 / 0.08), 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-md: 0 8px 24px -6px rgb(15 23 42 / 0.14), 0 2px 6px rgb(15 23 42 / 0.06);
+  --shadow-lg: 0 24px 48px -12px rgb(15 23 42 / 0.25);
+
+  --animate-fade-in: fade-in 160ms ease-out;
+  --animate-pulse-soft: pulse-soft 1.6s ease-in-out infinite;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(2px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes pulse-soft {
+    50% {
+      opacity: 0.55;
+    }
+  }
+}
+
+:root {
+  --ps-bg: #fafafa;
+  --ps-surface: #ffffff;
+  --ps-surface-2: #f4f4f5;
+  --ps-border: #e4e4e7;
+  --ps-border-strong: #d4d4d8;
+  --ps-fg: #18181b;
+  --ps-muted: #52525b;
+  --ps-subtle: #71717a;
+  --ps-accent: #2952b8;
+  --ps-accent-fg: #ffffff;
+  --ps-accent-soft: #eef2fd;
+  --ps-danger: #c02626;
+  --ps-danger-soft: #fdf0f0;
+  --ps-success: #15803d;
+  --ps-success-soft: #edfaf1;
+  --ps-warning: #a15c07;
+  --ps-warning-soft: #fdf7e8;
+  --ps-ring: #2952b8;
+  color-scheme: light;
+}
+
+.dark {
+  --ps-bg: #0b0b0d;
+  --ps-surface: #131316;
+  --ps-surface-2: #1b1b1f;
+  --ps-border: #26262b;
+  --ps-border-strong: #34343a;
+  --ps-fg: #f4f4f5;
+  --ps-muted: #b4b4bb;
+  --ps-subtle: #8b8b93;
+  --ps-accent: #7c9cf2;
+  --ps-accent-fg: #0b0b0d;
+  --ps-accent-soft: #18213a;
+  --ps-danger: #f27272;
+  --ps-danger-soft: #2a1414;
+  --ps-success: #4ade80;
+  --ps-success-soft: #10241a;
+  --ps-warning: #f5b544;
+  --ps-warning-soft: #2a2010;
+  --ps-ring: #7c9cf2;
+  color-scheme: dark;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv11', 'ss01';
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background: var(--ps-bg);
+    color: var(--ps-fg);
+  }
+  *:focus-visible {
+    outline: 2px solid var(--ps-ring);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--ps-accent-soft);
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Comfortable reading column for long texts (speeches, analyses). */
+@utility prose-reading {
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  max-width: 68ch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

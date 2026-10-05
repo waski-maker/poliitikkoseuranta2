@@ -12,7 +12,6 @@ import {
   requirePermission,
   restoreFromAudit,
   restoreFromTrash,
-  serialize,
 } from '@ps/core';
 
 const ServiceSchema = z

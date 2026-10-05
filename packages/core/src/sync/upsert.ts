@@ -99,8 +99,7 @@ export async function upsertSynced(
 }
 
 function toDbValue(v: unknown): unknown {
-  if (v !== null && typeof v === 'object' && !(v instanceof Date) && !Array.isArray(v))
-    return JSON.stringify(v);
+  // Objects go to jsonb columns; postgres.js serialises them by the column type.
   return v ?? null;
 }
 

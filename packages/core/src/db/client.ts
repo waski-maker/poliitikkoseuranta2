@@ -89,3 +89,12 @@ export function toSnake(s: string): string {
 export function toCamel(s: string): string {
   return s.replace(/_([a-z0-9])/g, (_, c: string) => c.toUpperCase());
 }
+
+/**
+ * The camelCase transform also applies to keys inside json/jsonb values.
+ * Raw row snapshots (backups, audit states) are converted back to the
+ * database's snake_case column names with this helper.
+ */
+export function snakeKeys(row: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(row).map(([k, v]) => [toSnake(k), v]));
+}

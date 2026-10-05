@@ -62,6 +62,8 @@ export async function createRuntime(opts: RuntimeOptions): Promise<Runtime> {
   const sync = new SyncRegistry();
   const searchTypes = new SearchTypeRegistry();
 
+  // Assigned once below; closures created earlier reference it lazily.
+  // eslint-disable-next-line prefer-const
   let runtime!: Runtime;
   const canRunInline = opts.host === 'node' || opts.host === 'worker' || opts.host === 'test';
 

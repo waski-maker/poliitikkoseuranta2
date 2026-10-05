@@ -57,11 +57,9 @@ export function registerAiRoutes(r: ModuleRouter, rt: Runtime): void {
         200: jsonContent(
           z.object({
             settings: AiSettingsSchema,
-            keysSet: z
-              .array(z.string())
-              .openapi({
-                description: 'Palvelut, joille on tallennettu tai ympäristössä asetettu API-avain',
-              }),
+            keysSet: z.array(z.string()).openapi({
+              description: 'Palvelut, joille on tallennettu tai ympäristössä asetettu API-avain',
+            }),
             knownModels: z.record(z.string(), z.array(z.string())),
             prices: z.record(z.string(), z.object({ input: z.number(), output: z.number() })),
           }),

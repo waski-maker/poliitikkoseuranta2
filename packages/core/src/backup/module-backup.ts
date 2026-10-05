@@ -1,5 +1,5 @@
 import type { Db } from '../db/client.ts';
-import { qualified } from '../db/client.ts';
+import { qualified, snakeKeys } from '../db/client.ts';
 import type { ModuleManifest } from '../modules/manifest.ts';
 import { ValidationError } from '../util/errors.ts';
 
@@ -33,7 +33,7 @@ export async function exportModule(
     )) as unknown as {
       row: Record<string, unknown>;
     }[];
-    tables[table] = rows.map((r) => r.row);
+    tables[table] = rows.map((r) => snakeKeys(r.row));
   }
   return {
     format: MODULE_BACKUP_FORMAT,
@@ -87,7 +87,7 @@ export async function importModule(
       await db.unsafe(
         `insert into ${q} select * from jsonb_populate_record(null::${q}, $1::jsonb)
          on conflict (id) do update set ${setList}`,
-        [JSON.stringify(row)],
+        [snakeKeys(row) as never],
       );
     }
     result.push({ table, rows: rows.length });
@@ -130,7 +130,7 @@ export async function restoreSnapshot(db: Db, snapshotId: string): Promise<numbe
   for (const row of snap.data) {
     await db.unsafe(
       `insert into ${q} select * from jsonb_populate_record(null::${q}, $1::jsonb) on conflict (id) do update set ${setList}`,
-      [JSON.stringify(row)],
+      [snakeKeys(row) as never],
     );
   }
   return snap.data.length;

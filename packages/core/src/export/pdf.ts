@@ -54,13 +54,18 @@ function wrap(font: PDFFont, text: string, size: number, width: number): string[
         continue;
       }
       if (line) lines.push(line);
-      // Hard-break very long words.
+      // Hard-break very long words (binary search for the longest fitting prefix).
       let w = word;
       while (font.widthOfTextAtSize(w, size) > width) {
-        let cut = w.length - 1;
-        while (cut > 1 && font.widthOfTextAtSize(w.slice(0, cut), size) > width) cut--;
-        lines.push(w.slice(0, cut));
-        w = w.slice(cut);
+        let lo = 1;
+        let hi = w.length - 1;
+        while (lo < hi) {
+          const mid = Math.ceil((lo + hi) / 2);
+          if (font.widthOfTextAtSize(w.slice(0, mid), size) <= width) lo = mid;
+          else hi = mid - 1;
+        }
+        lines.push(w.slice(0, lo));
+        w = w.slice(lo);
       }
       line = w;
     }

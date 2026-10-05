@@ -1,3 +1,4 @@
+import type { Dirent } from 'node:fs';
 import { AwsClient } from 'aws4fetch';
 import type { StorageAdapter, TestResult } from '../types.ts';
 import { hmacSha256, toBase64Url } from '../../util/crypto.ts';
@@ -80,7 +81,7 @@ export function diskStorage(opts: { dir: string; signingKey: string; publicApiUr
       const root = opts.dir;
       const out: { key: string; size: number; updatedAt: string | null }[] = [];
       const walk = async (dir: string) => {
-        let entries: import('node:fs').Dirent[] = [];
+        let entries: Dirent[] = [];
         try {
           entries = await (await fs()).readdir(dir, { withFileTypes: true });
         } catch {
