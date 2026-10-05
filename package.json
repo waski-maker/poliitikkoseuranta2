@@ -1,0 +1,46 @@
+{
+  "name": "poliitikkoseuranta",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Poliitikkoseuranta 2.0 – suomalaisen politiikan avoimen datan seuranta- ja analyysiohjelma",
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "deploy:setup": "node scripts/deploy-setup.mjs",
+    "dev": "node scripts/dev.mjs",
+    "dev:api": "pnpm --filter @ps/api dev",
+    "dev:web": "pnpm --filter @ps/web dev",
+    "build": "pnpm sdk:generate && pnpm -r --filter @ps/web --filter @ps/api build",
+    "build:web": "pnpm --filter @ps/web build",
+    "build:edge": "pnpm --filter @ps/api build:edge",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r --parallel typecheck",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "pnpm --filter @ps/web test:e2e",
+    "sdk:generate": "pnpm --filter @ps/api openapi:dump && pnpm --filter @ps/sdk generate",
+    "job": "tsx --env-file-if-exists=.env apps/worker/src/cli.ts",
+    "db:migrate": "tsx --env-file-if-exists=.env apps/worker/src/cli.ts db:migrate",
+    "db:seed": "tsx --env-file-if-exists=.env apps/worker/src/cli.ts db:seed",
+    "new-module": "node scripts/new-module.mjs",
+    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@types/node": "^22.10.0",
+    "eslint": "^9.39.0",
+    "eslint-plugin-react-hooks": "^7.0.0",
+    "globals": "^16.0.0",
+    "prettier": "^3.6.0",
+    "tsx": "^4.20.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.0",
+    "vitest": "^3.2.4"
+  }
+}

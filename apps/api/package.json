@@ -1,0 +1,33 @@
+{
+  "name": "@ps/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Hono-pohjainen REST-API (/api/v1) kaikille moduuleille. Ajetaan Supabase Edge Functionina, Node.js:ll\u00e4, Bunilla tai Dockerissa.",
+  "exports": {
+    ".": "./src/app.ts",
+    "./modules": "./src/modules.ts",
+    "./openapi": "./src/openapi.ts"
+  },
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=../../.env src/node.ts",
+    "start": "node dist/server.mjs",
+    "build": "node build.mjs node",
+    "build:edge": "node build.mjs edge",
+    "openapi:dump": "tsx src/openapi-dump.ts",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.0",
+    "@hono/zod-openapi": "^1.1.0",
+    "@ps/core": "workspace:*",
+    "@ps/m0001-registries": "workspace:*",
+    "hono": "^4.10.0",
+    "zod": "^4.1.0",
+    "postgres": "^3.4.7"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "typescript": "^5.9.3"
+  }
+}

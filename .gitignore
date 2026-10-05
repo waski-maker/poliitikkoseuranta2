@@ -1,0 +1,16 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+playwright-report/
+test-results/
+supabase/functions/api/_bundle/
+supabase/.temp/
+.data/
+backups/
+*.dump
+*.dump.enc

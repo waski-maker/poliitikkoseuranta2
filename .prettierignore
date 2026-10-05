@@ -1,0 +1,10 @@
+node_modules
+dist
+coverage
+pnpm-lock.yaml
+packages/sdk/src/schema.d.ts
+packages/sdk/openapi.json
+supabase/functions/api/_bundle
+docs/SPEC.md
+playwright-report
+test-results

@@ -1,0 +1,31 @@
+{
+  "name": "@ps/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./manifest": "./src/modules/manifest.ts",
+    "./node": "./src/node.ts",
+    "./testing": "./src/testing.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "aws4fetch": "^1.0.20",
+    "docx": "^9.5.1",
+    "fflate": "^0.8.2",
+    "jose": "^6.1.0",
+    "pdf-lib": "^1.17.1",
+    "postgres": "^3.4.7",
+    "zod": "^4.1.0",
+    "@anthropic-ai/sdk": "^0.131.0",
+    "hono": "^4.10.0",
+    "@hono/zod-openapi": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "typescript": "^5.9.3"
+  }
+}

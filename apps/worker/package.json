@@ -1,0 +1,17 @@
+{
+  "name": "@ps/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Taustatyöt komentoina: pnpm job run <työ>, pnpm job work. GitHub Actions, cron ja Docker kutsuvat samoja komentoja.",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ps/api": "workspace:*",
+    "@ps/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

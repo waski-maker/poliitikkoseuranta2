@@ -1,0 +1,34 @@
+{
+  "name": "@ps/m0001-registries",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "0.001 Perusrekisterit: puolueet, eduskuntaryhmät, vaalipiirit, vaalikaudet, hallitukset, valiokunnat, luottamustoimien tyypit",
+  "exports": {
+    ".": "./src/index.ts",
+    "./manifest": "./src/manifest.ts",
+    "./ui": "./src/ui/index.tsx"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@ps/core": "workspace:*",
+    "@hono/zod-openapi": "^1.1.0",
+    "zod": "^4.1.0"
+  },
+  "peerDependencies": {
+    "@ps/sdk": "workspace:*",
+    "@ps/ui": "workspace:*",
+    "react": "^19.0.0",
+    "react-router": "^7.0.0"
+  },
+  "devDependencies": {
+    "@ps/sdk": "workspace:*",
+    "@ps/ui": "workspace:*",
+    "@types/react": "^19.0.0",
+    "react": "^19.2.0",
+    "react-router": "^7.9.0",
+    "typescript": "^5.9.3"
+  }
+}
